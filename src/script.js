@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import GUI from "lil-gui";
-import { RectAreaLightHelper } from "three/examples/jsm/Addons.js";
+// import { RectAreaLightHelper } from "three/examples/jsm/Addons.js";
 
 // Debug
 const gui = new GUI();
@@ -12,6 +12,8 @@ const canvas = document.querySelector("canvas.webgl");
 
 // Scene
 const scene = new THREE.Scene();
+// const axesHelper = new THREE.AxesHelper();
+// scene.add(axesHelper);
 
 // Lights
 const lightTweaks = gui.addFolder("Light Options");
@@ -31,7 +33,7 @@ ambientLightTweaks
 	.addColor(ambientLight, "color")
 	.name("light color")
 	.onChange(() => {
-		material.color.set(ambientLight.color);
+		ambientLight.color.set(ambientLight.color);
 	});
 
 const directionalLight = new THREE.DirectionalLight(0x00fffc, 0.9);
@@ -48,7 +50,7 @@ directionalLightTweaks
 	.addColor(directionalLight, "color")
 	.name("light color")
 	.onChange(() => {
-		material.color.set(directionalLight.color);
+		directionalLight.color.set(directionalLight.color);
 	});
 directionalLightTweaks
 	.add(directionalLight.position, "x")
@@ -76,29 +78,115 @@ hemisphereLightTweaks
 	.addColor(hemisphereLight, "color")
 	.name("sky color")
 	.onChange(() => {
-		material.color.set(hemisphereLight.skyColor);
+		hemisphereLight.color.set(hemisphereLight.skyColor);
 	});
 hemisphereLightTweaks
 	.addColor(hemisphereLight, "groundColor")
 	.name("ground color")
 	.onChange(() => {
-		material.color.set(hemisphereLight.groundColor);
+		hemisphereLight.groundColor.set(hemisphereLight.groundColor);
 	});
 hemisphereLightTweaks
 	.add(hemisphereLight, "intensity")
 	.name("light intensity")
 	.min(0)
-	.max(3)
+	.max(5)
 	.step(0.001);
 
 const pointLight = new THREE.PointLight(0xff9000, 1.5, 4, 3);
 pointLight.position.set(1, -0.5, 1);
 scene.add(pointLight);
+const pointLightTweaks = lightTweaks.addFolder("Point Light");
+pointLightTweaks
+	.addColor(pointLight, "color")
+	.name("color")
+	.onChange(() => {
+		pointLight.color.set(pointLight.color);
+	});
+pointLightTweaks
+	.add(pointLight, "intensity")
+	.name("light intensity")
+	.min(0)
+	.max(5)
+	.step(0.001);
+pointLightTweaks
+	.add(pointLight, "distance")
+	.name("distance")
+	.min(0.0001)
+	.max(5)
+	.step(0.001);
+pointLightTweaks
+	.add(pointLight, "decay")
+	.name("decay")
+	.min(0.0001)
+	.max(5)
+	.step(0.001);
+pointLightTweaks
+	.add(pointLight.position, "x")
+	.name("x position")
+	.min(-4)
+	.max(4)
+	.step(0.1);
+pointLightTweaks
+	.add(pointLight.position, "y")
+	.name("y position")
+	.min(-4)
+	.max(4)
+	.step(0.1);
+pointLightTweaks
+	.add(pointLight.position, "z")
+	.name("z position")
+	.min(-4)
+	.max(4)
+	.step(0.1);
 
-const rectAreaLight = new THREE.RectAreaLight(0x4e00ff, 6, 1, 1);
-rectAreaLight.position.set(-1.5, 0, 1.5);
-rectAreaLight.lookAt(new THREE.Vector3());
+const rectAreaLight = new THREE.RectAreaLight(0x881aff, 0, 1, 1);
+// rectAreaLight.position.set(-1.5, 0, 1.5);
+rectAreaLight.position.y = 1;
 scene.add(rectAreaLight);
+const rectAreaLightTweaks = lightTweaks.addFolder("Rect Area Light");
+rectAreaLightTweaks
+	.addColor(rectAreaLight, "color")
+	.name("color")
+	.onChange(() => {
+		rectAreaLight.color.set(rectAreaLight.color);
+	});
+rectAreaLightTweaks
+	.add(rectAreaLight, "intensity")
+	.name("light intensity")
+	.min(0)
+	.max(10)
+	.step(0.001);
+rectAreaLightTweaks
+	.add(rectAreaLight, "width")
+	.name("width")
+	.min(0)
+	.max(10)
+	.step(0.001);
+rectAreaLightTweaks
+	.add(rectAreaLight, "height")
+	.name("height")
+	.min(0)
+	.max(10)
+	.step(0.001);
+rectAreaLightTweaks
+	.add(rectAreaLight.position, "x")
+	.name("x position")
+	.min(-4)
+	.max(4)
+	.step(0.1);
+rectAreaLightTweaks
+	.add(rectAreaLight.position, "y")
+	.name("y position")
+	.min(-4)
+	.max(4)
+	.step(0.1);
+rectAreaLightTweaks
+	.add(rectAreaLight.position, "z")
+	.name("z position")
+	.min(-4)
+	.max(4)
+	.step(0.1);
 
 const spotLight = new THREE.SpotLight(
 	0x78ff00,
@@ -112,6 +200,61 @@ spotLight.position.set(0, 2, 3);
 scene.add(spotLight.target);
 spotLight.target.position.x = -2;
 scene.add(spotLight);
+const spotLightLightTweaks = lightTweaks.addFolder("Rect Area Light");
+spotLightLightTweaks
+	.addColor(spotLight, "color")
+	.name("color")
+	.onChange(() => {
+		spotLight.color.set(spotLight.color);
+	});
+spotLightLightTweaks
+	.add(spotLight, "intensity")
+	.name("light intensity")
+	.min(0)
+	.max(10)
+	.step(0.001);
+spotLightLightTweaks
+	.add(spotLight, "distance")
+	.name("distance")
+	.min(0.001)
+	.max(10)
+	.step(0.001);
+spotLightLightTweaks
+	.add(spotLight, "angle")
+	.name("angle")
+	.min(0.001)
+	.max(Math.PI / 2)
+	.step(0.001);
+spotLightLightTweaks
+	.add(spotLight, "penumbra")
+	.name("penumbra")
+	.min(0)
+	.max(1)
+	.step(0.001);
+spotLightLightTweaks
+	.add(spotLight, "decay")
+	.name("decay")
+	.min(0)
+	.max(5)
+	.step(0.001);
+spotLightLightTweaks
+	.add(spotLight.target.position, "x")
+	.name("x position")
+	.min(-4)
+	.max(4)
+	.step(0.1);
+spotLightLightTweaks
+	.add(spotLight.target.position, "y")
+	.name("y position")
+	.min(-4)
+	.max(4)
+	.step(0.1);
+spotLightLightTweaks
+	.add(spotLight.target.position, "z")
+	.name("z position")
+	.min(-4)
+	.max(4)
+	.step(0.1);
 
 // const hemisphereLightHelper = new THREE.HemisphereLightHelper(
 // 	hemisphereLight,
