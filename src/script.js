@@ -200,7 +200,7 @@ spotLight.position.set(0, 2, 3);
 scene.add(spotLight.target);
 spotLight.target.position.x = -2;
 scene.add(spotLight);
-const spotLightLightTweaks = lightTweaks.addFolder("Rect Area Light");
+const spotLightLightTweaks = lightTweaks.addFolder("Spotlight");
 spotLightLightTweaks
 	.addColor(spotLight, "color")
 	.name("color")
