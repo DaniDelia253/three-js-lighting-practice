@@ -5,16 +5,6 @@ import { FontLoader } from "three/examples/jsm/Addons.js";
 import { TextGeometry } from "three/examples/jsm/Addons.js";
 // import { RectAreaLightHelper } from "three/examples/jsm/Addons.js";
 
-// const urlSplit = window.location.href.split("/");
-// urlSplit = urlSplit.findLast(x => x).toLowerCase() == "lights" ?
-// console.log(window.location);
-// console.log(urlSplit);
-// console.log(urlSplit.join("/"));
-
-window.location.pathname.toLowerCase() !== "/lights"
-	? (window.location.pathname = `/lights`)
-	: console.log("there :)");
-
 // Debug
 const gui = new GUI();
 gui.close();
@@ -27,10 +17,14 @@ const scene = new THREE.Scene();
 // const axesHelper = new THREE.AxesHelper();
 // scene.add(axesHelper);
 
+// Load Textures
+const textureLoader = new THREE.TextureLoader();
+const simpleShadow = textureLoader.load("/textures/simpleShadow.jpg");
+
 // Text
 const fontLoader = new FontLoader();
 fontLoader.load("/fonts/helvetiker_regular.typeface.json", (font) => {
-	const textGeometry = new TextGeometry("Lights", {
+	const textOptions = {
 		font,
 		size: 0.6,
 		depth: 0.2,
@@ -40,13 +34,20 @@ fontLoader.load("/fonts/helvetiker_regular.typeface.json", (font) => {
 		bevelSize: 0.02,
 		bevelOffset: 0,
 		bevelSegments: 5,
-	});
+	};
+	const textGeometry = new TextGeometry("Lights", textOptions);
+	const shadowTextGeometry = new TextGeometry("Shadows", textOptions);
 	const textMaterial = new THREE.MeshNormalMaterial();
 	const text = new THREE.Mesh(textGeometry, textMaterial);
+	const shadowText = new THREE.Mesh(shadowTextGeometry, textMaterial);
 	textGeometry.computeBoundingBox();
+	shadowTextGeometry.computeBoundingBox();
 	textGeometry.center();
-	scene.add(text);
+	shadowTextGeometry.center();
+	scene.add(text, shadowText);
 	text.position.y = 2.5;
+	shadowText.position.y = 2.5;
+	shadowText.position.x = shadowText.position.x + 8;
 });
 
 // Lights
@@ -318,7 +319,7 @@ const materialTweaks = gui.addFolder("Material Options");
 materialTweaks.add(material, "metalness").min(0).max(1).step(0.01);
 materialTweaks.add(material, "roughness").min(0).max(1).step(0.01);
 
-// Objects
+// Light Objects
 const sphere = new THREE.Mesh(new THREE.SphereGeometry(0.5, 32, 32), material);
 sphere.position.x = -1.5;
 
@@ -335,6 +336,35 @@ plane.rotation.x = -Math.PI * 0.5;
 plane.position.y = -0.65;
 
 scene.add(sphere, cube, torus, plane);
+
+// Shadow Objects
+const shadowSphere = new THREE.Mesh(
+	new THREE.SphereGeometry(0.5, 32, 32),
+	material
+);
+shadowSphere.position.x = 8;
+
+const shadowPlane = new THREE.Mesh(new THREE.PlaneGeometry(5, 5), material);
+shadowPlane.rotation.x = -Math.PI * 0.5;
+shadowPlane.position.y = -0.65;
+shadowPlane.position.x = 8;
+
+scene.add(shadowSphere, shadowPlane);
+
+// Shadow
+const shadowSphereShadow = new THREE.Mesh(
+	new THREE.PlaneGeometry(1.5, 1.5),
+	new THREE.MeshBasicMaterial({
+		color: 0x000000,
+		alphaMap: simpleShadow,
+		transparent: true,
+	})
+);
+shadowSphereShadow.rotation.x = -Math.PI * 0.5;
+shadowSphereShadow.position.x = shadowSphere.position.x;
+shadowSphereShadow.position.y = shadowPlane.position.y + 0.01;
+
+scene.add(shadowSphereShadow);
 
 // Sizes
 const sizes = {
@@ -363,9 +393,10 @@ const camera = new THREE.PerspectiveCamera(
 	0.1,
 	100
 );
-camera.position.x = -2;
+camera.position.x = -1;
 camera.position.y = 1;
 camera.position.z = 3;
+camera.lookAt(shadowSphere.position.z);
 scene.add(camera);
 
 // Controls
@@ -393,6 +424,15 @@ const tick = () => {
 	sphere.rotation.x = 0.15 * elapsedTime;
 	cube.rotation.x = 0.15 * elapsedTime;
 	torus.rotation.x = 0.15 * elapsedTime;
+
+	shadowSphere.position.x = Math.cos(elapsedTime) * 1.5 + 8;
+	shadowSphere.position.z = Math.sin(elapsedTime) * 1.5;
+	shadowSphere.position.y = Math.abs(Math.sin(elapsedTime * 3));
+
+	shadowSphereShadow.position.x = shadowSphere.position.x;
+	shadowSphereShadow.position.z = shadowSphere.position.z;
+	shadowSphereShadow.material.opacity =
+		(1.25 - shadowSphere.position.y) * 0.4;
 
 	// Update controls
 	controls.update();
