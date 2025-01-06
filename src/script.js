@@ -1,7 +1,19 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import GUI from "lil-gui";
+import { FontLoader } from "three/examples/jsm/Addons.js";
+import { TextGeometry } from "three/examples/jsm/Addons.js";
 // import { RectAreaLightHelper } from "three/examples/jsm/Addons.js";
+
+// const urlSplit = window.location.href.split("/");
+// urlSplit = urlSplit.findLast(x => x).toLowerCase() == "lights" ?
+// console.log(window.location);
+// console.log(urlSplit);
+// console.log(urlSplit.join("/"));
+
+window.location.pathname.toLowerCase() !== "/lights"
+	? (window.location.pathname = `/lights`)
+	: console.log("there :)");
 
 // Debug
 const gui = new GUI();
@@ -14,6 +26,28 @@ const canvas = document.querySelector("canvas.webgl");
 const scene = new THREE.Scene();
 // const axesHelper = new THREE.AxesHelper();
 // scene.add(axesHelper);
+
+// Text
+const fontLoader = new FontLoader();
+fontLoader.load("/fonts/helvetiker_regular.typeface.json", (font) => {
+	const textGeometry = new TextGeometry("Lights", {
+		font,
+		size: 0.6,
+		depth: 0.2,
+		curveSegments: 5,
+		bevelEnabled: true,
+		bevelThickness: 0.03,
+		bevelSize: 0.02,
+		bevelOffset: 0,
+		bevelSegments: 5,
+	});
+	const textMaterial = new THREE.MeshNormalMaterial();
+	const text = new THREE.Mesh(textGeometry, textMaterial);
+	textGeometry.computeBoundingBox();
+	textGeometry.center();
+	scene.add(text);
+	text.position.y = 2.5;
+});
 
 // Lights
 const lightTweaks = gui.addFolder("Light Options");
@@ -329,9 +363,9 @@ const camera = new THREE.PerspectiveCamera(
 	0.1,
 	100
 );
-camera.position.x = 1;
+camera.position.x = -2;
 camera.position.y = 1;
-camera.position.z = 2;
+camera.position.z = 3;
 scene.add(camera);
 
 // Controls
